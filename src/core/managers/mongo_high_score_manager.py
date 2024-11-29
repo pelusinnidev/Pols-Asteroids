@@ -1,5 +1,5 @@
 from pymongo import MongoClient, DESCENDING, ASCENDING
-from src.core.config.mongodb_config import get_database
+from src.core.config.mongodb_config import get_database, COLLECTION_NAME
 
 class MongoHighScoreManager:
     def __init__(self, max_scores=8):
@@ -11,8 +11,8 @@ class MongoHighScoreManager:
         
         if self.db is not None:
             try:
-                self.collection = self.db.Points
-                # Try to create index but don't fail if we can't
+                self.collection = self.db[COLLECTION_NAME]
+                # Crear índice en el campo 'score' descendente
                 try:
                     self.collection.create_index([("score", DESCENDING)])
                 except Exception as e:
@@ -30,33 +30,33 @@ class MongoHighScoreManager:
             self.status_message = "No hay conexión con MongoDB"
             return
             
-        self.status_message = "Carregant puntuacions..."
+        self.status_message = "Cargando puntuaciones..."
         try:
             # Cargar ordenado por posición
             self.high_scores = list(
                 self.collection.find({}, {'_id': 0})
-                .sort('position', ASCENDING)
+                .sort('score', DESCENDING)
                 .limit(self.max_scores)
             )
-            self.status_message = "Puntuacions carregades correctament"
+            self.status_message = "Puntuaciones cargadas correctamente"
             print("High scores cargadas correctamente desde MongoDB.")
         except Exception as e:
-            self.status_message = f"Error al carregar puntuacions: {str(e)}"
+            self.status_message = f"Error al cargar puntuaciones: {str(e)}"
             print(f"Error cargando high scores desde MongoDB: {e}")
             self.high_scores = []
-
+            
     def save_high_scores(self):
         """Guarda las puntuaciones en MongoDB."""
         if self.collection is None:
             self.status_message = "No hay conexión con MongoDB"
             return
             
-        self.status_message = "Guardant puntuacions..."
+        self.status_message = "Guardando puntuaciones..."
         try:
-            # En lugar de eliminar e insertar, actualizamos usando upsert
+            # Actualizar usando upsert
             for i, score in enumerate(self.high_scores):
                 self.collection.update_one(
-                    {"position": i},  # Criterio de búsqueda
+                    {"position": i},
                     {
                         "$set": {
                             "name": score["name"],
@@ -64,18 +64,18 @@ class MongoHighScoreManager:
                             "position": i
                         }
                     },
-                    upsert=True  # Crear si no existe
+                    upsert=True
                 )
             
             # Eliminar puntuaciones antiguas que ya no están en el top
             self.collection.delete_many({"position": {"$gte": len(self.high_scores)}})
             
-            self.status_message = "Puntuacions guardades correctament"
+            self.status_message = "Puntuaciones guardadas correctamente"
             print("High scores guardadas correctamente en MongoDB.")
         except Exception as e:
-            self.status_message = f"Error al guardar puntuacions: {str(e)}"
+            self.status_message = f"Error al guardar puntuaciones: {str(e)}"
             print(f"Error guardando high scores en MongoDB: {e}")
-
+            
     def is_high_score(self, score):
         """Verifica si una puntuación es suficiente para entrar en las high scores."""
         if len(self.high_scores) < self.max_scores:
@@ -88,10 +88,10 @@ class MongoHighScoreManager:
             self.status_message = "Error: formato de datos inválido"
             return False
             
-        if len(name) > 3:  # Since you limit names to 3 characters in the game
+        if len(name) > 3:  # Limitar nombres a 3 caracteres en el juego
             name = name[:3]
             
-        self.status_message = "Afegint nova puntuació..."
+        self.status_message = "Añadiendo nueva puntuación..."
         new_score = {'name': name, 'score': score}
         self.high_scores.append(new_score)
         self.high_scores = sorted(
@@ -105,7 +105,7 @@ class MongoHighScoreManager:
             self.save_high_scores()
             return True
         else:
-            self.status_message = "Puntuació guardada localment (sense connexió a MongoDB)"
+            self.status_message = "Puntuación guardada localmente (sin conexión a MongoDB)"
             return False
 
     def get_high_scores(self):

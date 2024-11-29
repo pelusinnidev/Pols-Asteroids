@@ -12,29 +12,29 @@ from src.utils.constants import *
 from src.core.managers.mongo_high_score_manager import MongoHighScoreManager
 import pygame
 
-# Inicialitzar Pygame
+# Inicializar Pygame
 pygame.init()
 pygame.mixer.init()  # Asegúrate de que el mixer está inicializado
 
-# Funció per carregar música amb gestió d'errors
+# Función para cargar música con gestión de errores
 def load_music(path):
     try:
         pygame.mixer.music.load(path)
-        print(f"Música carregada: {path}")
+        print(f"Música cargada: {path}")
     except pygame.error as e:
-        print(f"Error carregant música {path}: {e}")
+        print(f"Error cargando música {path}: {e}")
 
-# Crear instància de HighScoreManager
+# Crear instancia de MongoHighScoreManager
 high_score_manager = MongoHighScoreManager()
 
 class Game:
     def __init__(self):
-        # Inicialitzar en mode finestra
+        # Inicializar en modo ventana
         self.screen = pygame.display.set_mode((DEFAULT_WIDTH, DEFAULT_HEIGHT))
         pygame.display.set_caption("Asteroids")
         self.clock = pygame.time.Clock()
         
-        # Guardar l'estat de la pantalla
+        # Guardar el estado de la pantalla
         self.is_fullscreen = False
         
         self.menu_scene = MenuScene(high_score_manager)
@@ -43,20 +43,20 @@ class Game:
         self.intro_scene = IntroScene()
         self.current_scene = "INTRO"
         
-        # Flags per càrrega de música
+        # Flags para carga de música
         self.menu_music_loaded = False
         self.game_music_loaded = False
     
     def toggle_fullscreen(self):
         self.is_fullscreen = not self.is_fullscreen
         if self.is_fullscreen:
-            # Obtenir la resolució real de la pantalla
+            # Obtener la resolución real de la pantalla
             info = pygame.display.Info()
             self.screen = pygame.display.set_mode((info.current_w, info.current_h), FULLSCREEN_MODE)
-            print("Mode Fullscreen activat.")
+            print("Modo Fullscreen activado.")
         else:
             self.screen = pygame.display.set_mode((DEFAULT_WIDTH, DEFAULT_HEIGHT), WINDOW_MODE)
-            print("Mode finestra activat.")
+            print("Modo ventana activado.")
     
     def run(self):
         try:
@@ -67,9 +67,9 @@ class Game:
                         pygame.quit()
                         sys.exit()
                     elif event.type == pygame.KEYDOWN:
-                        # Only allow pausing when in the GAME scene
+                        # Solo permitir pausar cuando está en la escena GAME
                         if event.key == pygame.K_ESCAPE and self.current_scene == "GAME":
-                            pause_music()  # Pause music when entering pause
+                            pygame.mixer.music.pause()  # Pausar música al entrar en pausa
                             self.current_scene = "PAUSE"
 
                 if self.current_scene == "INTRO":
@@ -86,16 +86,16 @@ class Game:
                 pygame.display.flip()
                 self.clock.tick(FPS)
         except KeyboardInterrupt:
-            print("Game interrupted by user.")
+            print("Juego interrumpido por el usuario.")
             pygame.quit()
             sys.exit()
-    
+
     def _handle_intro(self, events):
         if not self.game_music_loaded:
             load_music('src/assets/music/game_music.mp3')
             pygame.mixer.music.play(-1)
             self.game_music_loaded = True
-            print("Música inicial carregada.")
+            print("Música inicial cargada.")
             
         result = self.intro_scene.update()
         if result == "MENU":
@@ -133,7 +133,7 @@ class Game:
             self.current_scene = "MENU"
             self.menu_music_loaded = False
             self.game_music_loaded = False
-            self.game_scene = None  # Reiniciar la instància de GameScene
+            self.game_scene = None  # Reiniciar la instancia de GameScene
             return
         elif update_result == "NEW_HIGHSCORE":
             self.current_scene = "NEW_HIGHSCORE"
@@ -145,9 +145,9 @@ class Game:
             pygame.mixer.music.play(-1)  # Reproducir en bucle
             self.game_music_loaded = True
             self.menu_music_loaded = False
-            print("Música del joc activada.")
+            print("Música del juego activada.")
         
-        # Pass all events to GameScene.handle_input
+        # Pasar todos los eventos a GameScene.handle_input
         for event in events:
             result = self.game_scene.handle_input(event)
             if result == "QUIT":
@@ -161,12 +161,12 @@ class Game:
                 self.toggle_fullscreen()
 
         self.game_scene.draw(self.screen)
-    
+
     def _handle_pause(self, events):
         for event in events:
             result = self.pause_scene.handle_input(event)
             if result == "RESUME":
-                unpause_music()  # Reanudar la música al salir de la pausa
+                pygame.mixer.music.unpause()  # Reanudar la música al salir de pausa
                 self.current_scene = "GAME"
             elif result == "MENU":
                 pygame.mixer.music.stop()  # Opcionalmente detener la música si se va al menú
@@ -179,22 +179,22 @@ class Game:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                if self.game_scene:  # Verificar si existeix game_scene
+                if self.game_scene:  # Verificar si existe game_scene
                     if event.key == pygame.K_RETURN:
                         name = self.game_scene.player_name.strip() or "AAA"
                         high_score_manager.add_high_score(name, self.game_scene.score)
-                        print(f"Nou punç alt guardat: {name} - {self.game_scene.score}")
+                        print(f"Nuevo high score guardado: {name} - {self.game_scene.score}")
                         self.current_scene = "MENU"
                         self.game_scene = None
                     elif event.key == pygame.K_BACKSPACE:
                         self.game_scene.player_name = self.game_scene.player_name[:-1]
-                        print(f"Eliminant l'última lletra del nom: {self.game_scene.player_name}")
+                        print(f"Eliminando la última letra del nombre: {self.game_scene.player_name}")
                     else:
                         if len(self.game_scene.player_name) < 3 and event.unicode.isalpha():
                             self.game_scene.player_name += event.unicode.upper()
-                            print(f"Llitura de nom actual: {self.game_scene.player_name}")
+                            print(f"Lectura de nombre actual: {self.game_scene.player_name}")
         
-        if self.game_scene:  # Només dibuixa si existeix game_scene
+        if self.game_scene:  # Solo dibuja si existe game_scene
             self.game_scene.draw(self.screen)
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 from src.utils.button import Button
 from src.utils.constants import *
-from src.core.managers.high_score_manager import HighScoreManager
+from src.core.managers.mongo_high_score_manager import MongoHighScoreManager
 
 class MenuScene:
-    def __init__(self, high_score_manager: HighScoreManager):
+    def __init__(self, high_score_manager: MongoHighScoreManager):
         self.version_font = pygame.font.Font(None, 24)
         self.title_font = pygame.font.Font('src/assets/fonts/PressStart2P-Regular.ttf', 48)  # Increased size for better visibility
         self.highscore_font = pygame.font.Font('src/assets/fonts/PressStart2P-Regular.ttf', 28)  # Larger font for scores

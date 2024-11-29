@@ -3,11 +3,11 @@ from src.entities.player.spaceship import Spaceship
 from src.entities.objects.asteroid import Asteroid
 from src.entities.objects.projectile import Projectile
 from src.utils.constants import *
-from src.core.managers.high_score_manager import HighScoreManager
+from src.core.managers.mongo_high_score_manager import MongoHighScoreManager
 
 
 class GameScene:
-    def __init__(self, high_score_manager: HighScoreManager):
+    def __init__(self, high_score_manager: MongoHighScoreManager):
         self.player = Spaceship(Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.asteroids = []
         self.projectiles = []
