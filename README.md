@@ -2,6 +2,8 @@
 
 Welcome to **Pol's Asteroids Game**, where classic arcade fun meets modern gaming magic! 🌟 Pilot your spaceship, dodge and blast those pesky asteroids, and aim for the high score in this thrilling Python and Pygame adventure.
 
+![Screenshot 2024-12-02 at 10 03 43](https://github.com/user-attachments/assets/de6bd481-f417-4233-a273-775ae54a30cc)
+
 <div align="center">
   <a href="https://pelusinnidev.craft.me/AsteroidsGame">Check out the Report and Developer Notes (Available in Catalan)</a>
 </div>
