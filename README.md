@@ -103,14 +103,6 @@ Get ready to blast off! Follow these simple steps to set up the game on your mac
 
 We love contributions! Whether it's a bug fix, a new feature, or just some awesome ideas, feel free to open an issue or submit a pull request. Let's make **Pol's Asteroids** even more awesome together! 🤝
 
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE). Feel free to use and modify it as you see fit!
-
-## 📫 Contact
-
-Got questions, feedback, or just want to say hi? Drop us a line at [your.email@example.com](mailto:your.email@example.com). We'd love to hear from you!
-
 ---
 
 ![Developer](https://github.com/pelusinnidev/Pols-Asteroids/blob/main/src/assets/images/developer_logo.jpg?raw=true)  
