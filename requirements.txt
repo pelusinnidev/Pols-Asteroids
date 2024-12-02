@@ -1,0 +1,4 @@
+pygame==2.3.0
+pymongo==4.4.1
+python-dotenv==1.0.0
+certifi==2023.12.22 
